@@ -20,7 +20,7 @@ const WebChatProvider = dynamic(
         window.React = React;
         window.ReactDOM = ReactDOM;
         const WebChat = await import('botframework-webchat');
-        return function WebChatProvider(props) { return <WebChatContext.Provider value={WebChat} {...props} />; };
+        return (props) => <WebChatContext.Provider value={WebChat} {...props} />;
     },
     { ssr: false, suspense: true }
 );
@@ -39,7 +39,11 @@ function DigitalAssistantPageInner() {
                     return response.json();
                 })
                 .then(data => {
-                    setDirectLineToken(data.token);
+                    setDirectLineToken(
+                        createDirectLine({
+                            token: data.token,
+                        })
+                    );
                 })
                 .catch(error => {
                     console.error('Error fetching Direct Line token:', error);
