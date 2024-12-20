@@ -20,9 +20,7 @@ const WebChatProvider = dynamic(
     window.React = React;
     window.ReactDOM = ReactDOM;
     const WebChat = await import('botframework-webchat');
-    return function WebChatProvider(props) {
-      return <WebChatContext.Provider value={WebChat} {...props} />;
-    };
+    return (props) => <WebChatContext.Provider value={WebChat} {...props} />;
   },
   { ssr: false, suspense: true }
 );
