@@ -29,26 +29,34 @@ function DigitalAssistantPageInner() {
     const { createDirectLine, default: ReactWebChat } = useContext(WebChatContext);
     const [directLineToken, setDirectLineToken] = useState('');
 
-    useEffect(() => {
-        if (createDirectLine && directLineToken === '') {
-            fetch('/api/getDirectlineToken')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
+    const fetchDirectLineToken = async () => {
+        try {
+            const response = await fetch('/api/getDirectlineToken');
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // Use the received token to create the DirectLine object
+            setDirectLineToken(
+                createDirectLine({
+                    domain: new URL('v3/directline', data.directLineURL),
+                    token: data.token
                 })
-                .then(data => {
-                    setDirectLineToken(
-                        createDirectLine({
-                            token: data.token,
-                        })
-                    );
-                })
-                .catch(error => {
-                    console.error('Error fetching Direct Line token:', error);
-                });
+            );
+        } catch (error) {
+            console.error('Error fetching Direct Line token:', error);
         }
+    };
+
+    useEffect(() => {
+        // Call the async function
+        if (createDirectLine && directLineToken === '') {
+            fetchDirectLineToken();
+        }
+
     }, [directLineToken, createDirectLine]);
 
     if (directLineToken == '') {
